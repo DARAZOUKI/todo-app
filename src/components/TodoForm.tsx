@@ -11,30 +11,40 @@ const TodoForm = ({ onTodoAdded }: { onTodoAdded: (todo: Todo) => void }) => {
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+  
     if (title.length < 3) {
       setError('Title must be at least 3 characters long'); 
       return;
     }
-
+  
+    if (description.length > 200) {
+      setError('Description must be at most 200 characters long'); 
+      return;
+    }
+  
     const newTodo: Todo = {
-      title, description, status, id: '',
+      title, 
+      description, 
+      status, 
+      id: '', 
       _id: undefined
     };
-    
+  
     try {
+      setError(null); // Reset error
       const createdTodo = await createTodo(newTodo);
       onTodoAdded(createdTodo);
-      
+  
       // Reset form fields
       setTitle('');
       setDescription('');
       setStatus('Not started');
-      setError(null);
     } catch (error) {
       console.error('Error:', error);
       setError('Failed to create todo'); 
     }
   };
+  
 
   return (
     <form className="todo-form" onSubmit={handleSubmit}>
@@ -77,7 +87,7 @@ const TodoForm = ({ onTodoAdded }: { onTodoAdded: (todo: Todo) => void }) => {
         </select>
       </div>
 
-      {error && <p className="error-message">{error}</p>}  {/*  Display error message */}
+      {error && <p className="error-message">{error}</p>}  {}
 
       <button type="submit" className="submit-btn">Add Todo</button>
     </form>

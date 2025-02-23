@@ -8,24 +8,33 @@ import Footer from './components/Footer.tsx';
 
 const App: React.FC = () => {
   const [todos, setTodos] = useState<Todo[]>([]);
-  const [refresh, setRefresh] = useState<boolean>(false); 
+  const [refresh, setRefresh] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Fetch todos when `refresh` changes
+  // Fetch todos when "refresh" changes
   useEffect(() => {
     const fetchTodos = async () => {
+      setLoading(true);
+      setError(null); // Reset error before fetching
+
       try {
         const response = await fetch('http://localhost:3000/todos');
+        if (!response.ok) throw new Error("Failed to fetch todos");
+        
         const data = await response.json();
         setTodos(data);
       } catch (error) {
-        console.error('Error fetching todos:', error);
+        setError("Error fetching todos.");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchTodos();
-  }, [refresh]); // refresh state
+  }, [refresh]);
 
-  // adding a new todo
+  // Adding a new todo
   const addTodo = async (todo: Todo) => {
     try {
       await fetch('http://localhost:3000/todos', {
@@ -44,7 +53,15 @@ const App: React.FC = () => {
       <Header />
       <main className="main-content">
         <TodoForm onTodoAdded={addTodo} />
-        <TodoList todos={todos} setRefresh={setRefresh} />
+
+        {/* Show loading state */}
+        {loading && <p className="loading-message">Loading todos...</p>}
+
+        {/* Show error message if fetching fails */}
+        {error && <p className="error-message">{error}</p>}
+
+        {/* Show the todo list only when not loading */}
+        {!loading && <TodoList todos={todos} setRefresh={setRefresh} />}
       </main>
       <Footer />
     </div>

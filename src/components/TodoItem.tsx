@@ -13,21 +13,27 @@ const TodoItem: React.FC<TodoItemProps> = ({ todo, onDelete, onUpdate }) => {
   const [description, setDescription] = useState(todo.description);
   const [status, setStatus] = useState(todo.status);
 
- const handleUpdate = () => {
-  if (!todo._id) {
-    console.error("Error: Todo ID is undefined, cannot update.");
-    return;
-  }
-
-  onUpdate({
-    _id: todo._id, // Ensure _id is included
-    title: title || "", 
-    description: description || "",
-    status: status || "Not started",
-  });
-
-  setIsEditing(false);
-};
+  const handleUpdate = () => {
+    if (description.length > 200) {
+      alert("Description must be at most 200 characters long");
+      return;
+    }
+  
+    if (!todo._id) {
+      console.error("Error: Todo ID is undefined, cannot update.");
+      return;
+    }
+  
+    onUpdate({
+      _id: todo._id,
+      title: title || "", 
+      description: description || "",
+      status: status || "Not started",
+    });
+  
+    setIsEditing(false);
+  };
+  
 
   
 
